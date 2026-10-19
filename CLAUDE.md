@@ -1,23 +1,27 @@
 # gastos-viaje
 
-App personal para registrar gastos de viaje con foto del ticket y exportar
-un ZIP (fotos renombradas + resumen) al cerrar el viaje.
+Página web personal para registrar gastos de viaje con foto del ticket y, al cerrar el
+viaje, descargar un ZIP (fotos renombradas + resumen.txt). Mismo enfoque que el repo
+`cuaderno-gimnasio`: estática, GitHub Pages, datos solo en el navegador.
 
 ## Decisiones
 
-- **Sin base de datos.** Un viaje = `datos/<slug>/viaje.json` + `fotos/`.
-- **Importes en céntimos (int).** Nunca floats en el JSON. Formato español al mostrar.
-- **Una sola dependencia: flask.** Sin frameworks de frontend; plantillas en
-  `PLANTILLAS` dentro de `app.py`. Pensado para correr en una Raspberry Pi.
-- **Grupos del resumen fijos:** Comida, Transporte, Otros. Las categorías y su
-  grupo están en `CATEGORIAS`; para añadir una, añadirla ahí.
-- **Nombre de foto exportada:** `NN_fecha_categoria_importeEUR[_k].ext`, con NN
-  = fila del CSV (gastos ordenados por fecha y creación). No cambiarlo sin
-  actualizar `pruebas.py`.
-- Viaje cerrado = solo lectura; la descarga solo está disponible si está cerrado.
+- **Sin servidor.** Nada de backend por ahora (quizá en el futuro). Todo funciona en
+  local en el navegador: `localStorage` para viajes, IndexedDB para fotos.
+- **Sin dependencias ni librerías.** JS a mano; el ZIP lo escribe `crearZip` (sin
+  compresión: las fotos ya son JPEG).
+- **Importes en céntimos (int).** Nunca floats guardados. Formato español al mostrar.
+- **Grupos fijos:** Comida, Transporte, Otros. Categorías y su grupo en `CATEGORIAS`
+  (`logica.js`); para añadir una, añadirla ahí.
+- **Nombre de foto en el ZIP:** `fecha_concepto_importeEUR[_n].ext`. No cambiarlo sin
+  actualizar `pruebas.mjs`.
+- **Resumen:** por día separado en Comida / Transporte / Otros, total del viaje,
+  pagado por persona (si hay compañeros) y detalle con el nombre de cada foto.
+- Viaje cerrado = solo lectura; se puede reabrir.
+- Lógica pura en `logica.js` (probable con node); DOM y almacenamiento en `app.js`.
 
 ## Convenciones
 
 - Código, comentarios y textos en castellano.
-- `python3 pruebas.py` debe pasar antes de cada commit.
-- Sin autenticación: solo red local.
+- `node --test pruebas.mjs` debe pasar antes de cada commit.
+- Al cambiar JS o CSS, subir el `?v=` en `index.html`.
