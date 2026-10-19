@@ -57,6 +57,21 @@ pruebas.mjs           node --test pruebas.mjs
 Al cambiar `app.js`, `logica.js` o `estilos.css`, sube el `?v=` en `index.html` para que el
 móvil no use la versión en caché.
 
+## Estadísticas
+
+Contador de uso con [GoatCounter](https://www.goatcounter.com), sin cookies.
+Panel: https://gim-data.goatcounter.com (la app sale en la ruta `/gastos-viaje/`).
+
+- **Visitas**: aperturas de la página, de dónde llegan, país, navegador, sistema y pantalla.
+- **Eventos**: `abierta-instalada` / `abierta-navegador`, `viaje-creado`, `gasto-anadido`,
+  `gasto-editado`, `foto-camara` / `foto-galeria`, `viaje-cerrado`, `zip-descargado`,
+  `zip-compartido`, `viaje-reabierto`, `viaje-borrado`.
+- **Nunca se envía**: nombres de viaje o personas, importes, comentarios, fechas ni fotos.
+  Solo el nombre fijo del evento.
+- Si el script no carga (bloqueador, sin conexión), la app funciona igual.
+- **Excluir tus visitas**: abre una vez la web con `#toggle-goatcounter` al final de la URL
+  (https://jonmg.github.io/gastos-viaje/#toggle-goatcounter), en cada dispositivo.
+
 ## Publicar
 
 GitHub Pages: Settings → Pages → *Deploy from a branch* → `main`, `/ (root)`.

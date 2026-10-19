@@ -14,6 +14,21 @@ const claveFecha = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
 const HOY = claveFecha(new Date());
 const nuevoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
+/* ---------- Estadísticas (GoatCounter) ----------
+   Solo nombres de evento fijos: nunca nombres, importes, comentarios ni fotos.
+   El script carga en asíncrono: lo que llegue antes se guarda en cola. Si no carga
+   (bloqueador, sin conexión) no pasa nada. */
+const Estad = {
+  cola: [],
+  evento(path, title) { this.cola.push({ path, title, event: true }); this.vaciar(); },
+  vaciar() {
+    const gc = window.goatcounter;
+    if (!gc?.count) return;
+    try { while (this.cola.length) gc.count(this.cola.shift()); } catch (e) {}
+  },
+};
+const evento = (path, title) => Estad.evento(path, title);
+
 /* ---------- Almacenamiento ---------- */
 const Datos = {
   viajes: [], ajustes: {},
@@ -289,6 +304,7 @@ async function guardarGasto(v) {
   } catch (e) { aviso("No se pudo guardar la foto: " + (e.message || e), true); }
   ultimoMotivo = g.categoria;
   if (!Datos.guardar()) return;
+  evento(editando ? "gasto-editado" : "gasto-anadido", editando ? "Gasto editado" : "Gasto añadido");
   aviso(`${editando ? "Guardado" : "Añadido"}: ${categoria(g.categoria)[0]} ${euros(g.importe)}`);
   editando = null; limpiarPendientes(); pintar();
 }
@@ -320,6 +336,7 @@ async function descargar(v) {
   a.href = url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   v.descargado = Date.now(); Datos.guardar();
+  evento("zip-descargado", "ZIP descargado");
 }
 
 async function accion(b) {
@@ -340,6 +357,7 @@ async function accion(b) {
       };
       Datos.viajes.push(nv); Datos.guardar();
       navigator.storage?.persist?.(); // que el navegador no borre las fotos por falta de espacio
+      evento("viaje-creado", "Viaje creado");
       return irA(nv.id);
     }
     case "guardar-gasto": return guardarGasto(v);
@@ -366,21 +384,23 @@ async function accion(b) {
       const sinFoto = v.gastos.filter(g => !g.fotos.length).length;
       if (!confirm(`¿Cerrar «${v.nombre}»?${sinFoto ? `\n\n${sinFoto} gasto(s) no tienen foto.` : ""}\n\nSe descargará el ZIP. Podrás reabrirlo si hace falta.`)) return;
       v.estado = "cerrado"; v.cerrado = Date.now(); Datos.guardar(); editando = null; limpiarPendientes();
+      evento("viaje-cerrado", "Viaje cerrado");
       pintar(); return descargar(v);
     }
     case "descargar": return descargar(v);
     case "compartir": {
       const f = await generarZip(v);
-      try { await navigator.share({ files: [f], title: f.name }); v.descargado = Date.now(); Datos.guardar(); }
+      try { await navigator.share({ files: [f], title: f.name }); v.descargado = Date.now(); Datos.guardar(); evento("zip-compartido", "ZIP compartido"); }
       catch (e) { if (e.name !== "AbortError") aviso("No se pudo compartir; usa Descargar.", true); }
       return;
     }
-    case "reabrir": v.estado = "abierto"; delete v.cerrado; Datos.guardar(); return pintar();
+    case "reabrir": v.estado = "abierto"; delete v.cerrado; Datos.guardar(); evento("viaje-reabierto", "Viaje reabierto"); return pintar();
     case "borrar-viaje": {
       if (!v.descargado && !confirm("Aún no has descargado el ZIP de este viaje. ¿Seguro?")) return;
       if (prompt(`Se borrarán gastos y fotos de este móvil. Escribe BORRAR para confirmar.`)?.trim().toUpperCase() !== "BORRAR") return;
       for (const g of v.gastos) for (const f of g.fotos) await Fotos.borrar(f.id).catch(() => {});
       Datos.viajes = Datos.viajes.filter(x => x !== v); Datos.guardar();
+      evento("viaje-borrado", "Viaje borrado");
       return irA(null);
     }
   }
@@ -400,6 +420,8 @@ function repintarForm(v) {
 
 async function anadirFotos(input) {
   const v = Datos.viaje(actual);
+  if (input.files.length) evento(input.hasAttribute("capture") ? "foto-camara" : "foto-galeria",
+    input.hasAttribute("capture") ? "Foto con cámara" : "Foto de galería");
   for (const file of input.files) {
     let blob = file, ext = extDe(file.type);
     try { blob = await reducirFoto(file); ext = "jpg"; }
@@ -425,6 +447,9 @@ document.addEventListener("keydown", ev => {
 
 window.addEventListener("DOMContentLoaded", async () => {
   Datos.cargar();
+  const instalada = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  evento(instalada ? "abierta-instalada" : "abierta-navegador", instalada ? "Abierta como app instalada" : "Abierta en el navegador");
+  document.getElementById("goatcounter")?.addEventListener("load", () => Estad.vaciar());
   try { actual = localStorage.getItem(CLAVE + "-actual") || null; } catch (e) {}
   pintar();
   try { await Fotos.cargar(); pintar(); } catch (e) { aviso("Este navegador no permite guardar fotos (¿modo privado?).", true); }

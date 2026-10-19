@@ -8,7 +8,7 @@ viaje, descargar un ZIP (fotos renombradas + resumen.txt). Mismo enfoque que el 
 
 - **Sin servidor.** Nada de backend por ahora (quizá en el futuro). Todo funciona en
   local en el navegador: `localStorage` para viajes, IndexedDB para fotos.
-- **Sin dependencias ni librerías.** JS a mano; el ZIP lo escribe `crearZip` (sin
+- **Sin dependencias ni librerías** (salvo el script de GoatCounter). JS a mano; el ZIP lo escribe `crearZip` (sin
   compresión: las fotos ya son JPEG).
 - **Importes en céntimos (int).** Nunca floats guardados. Formato español al mostrar.
 - **Grupos fijos:** Comida, Transporte, Otros. Categorías y su grupo en `CATEGORIAS`
@@ -18,6 +18,8 @@ viaje, descargar un ZIP (fotos renombradas + resumen.txt). Mismo enfoque que el 
 - **Resumen:** por día separado en Comida / Transporte / Otros, total del viaje,
   pagado por persona (si hay compañeros) y detalle con el nombre de cada foto.
 - Viaje cerrado = solo lectura; se puede reabrir.
+- **Estadísticas con GoatCounter** (`gim-data`): solo eventos con nombre fijo vía
+  `evento()` en `app.js`. Nunca enviar datos del usuario (nombres, importes, textos, fotos).
 - Lógica pura en `logica.js` (probable con node); DOM y almacenamiento en `app.js`.
 
 ## Convenciones
