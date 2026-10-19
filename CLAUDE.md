@@ -18,7 +18,7 @@ viaje, descargar un ZIP (fotos renombradas + resumen.txt). Mismo enfoque que el 
 - **Resumen:** por día separado en Comida / Transporte / Otros, total del viaje,
   pagado por persona (si hay compañeros) y detalle con el nombre de cada foto.
 - Viaje cerrado = solo lectura; se puede reabrir.
-- **Estadísticas con GoatCounter** (`gim-data`): solo eventos con nombre fijo vía
+- **Estadísticas con GoatCounter** (`jon-apps`): solo eventos con nombre fijo vía
   `evento()` en `app.js`. Nunca enviar datos del usuario (nombres, importes, textos, fotos).
 - Lógica pura en `logica.js` (probable con node); DOM y almacenamiento en `app.js`.
 

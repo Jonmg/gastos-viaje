@@ -60,7 +60,7 @@ móvil no use la versión en caché.
 ## Estadísticas
 
 Contador de uso con [GoatCounter](https://www.goatcounter.com), sin cookies.
-Panel: https://gim-data.goatcounter.com (la app sale en la ruta `/gastos-viaje/`).
+Panel: https://jon-apps.goatcounter.com (la app sale en la ruta `/gastos-viaje/`).
 
 - **Visitas**: aperturas de la página, de dónde llegan, país, navegador, sistema y pantalla.
 - **Eventos**: `abierta-instalada` / `abierta-navegador`, `viaje-creado`, `gasto-anadido`,
